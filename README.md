@@ -24,13 +24,12 @@ Assistente introdutório sobre documentos pessoais (RG, CPF, título de eleitor,
 ## 4. Prompt injection
 Tratar todo conteúdo externo como dado, não instrução. Não revelar prompt do sistema e não aceitar "regras novas" vindas da mensagem.
 
-## 5. Arquitetura (justificar por escrito, curto)
-Decidir e justificar:
-- [ ] Framework (LangChain, LangGraph, CrewAI ou similar) e por quê
-- [ ] Um agente ou vários, e o papel de cada um
-- [ ] Modelo de linguagem (Ollama, Groq ou outro permitido) e por quê
-- [ ] Onde entra IA e onde bastam lógica/algoritmos (busca, condicionais, validações, regex de dados pessoais)
-- [ ] Como as fichas são carregadas (prompt, estrutura de dados ou busca por trechos) e por quê
+## 5. Arquitetura (justificativa resumida)
+- [x] **Framework: LangChain.** Fluxo simples (prompt | modelo | parser) que o grupo já conhece; LangGraph ou CrewAI seriam excesso.
+- [x] **Um agente só.** A tarefa é única (responder a partir de 7 fichas); mais agentes só aumentariam custo, latência e risco de prompt injection.
+- [x] **Modelos (Groq):** agente `openai/gpt-oss-120b`; juiz `openai/gpt-oss-20b` (outro modelo, para não avaliar a si mesmo). Os Llama saíram do plano gratuito.
+- [x] **IA x lógica:** a IA entende a pergunta, redige a resposta com fonte e julga; validação de entrada, regex de dados pessoais, aviso fixo e checagem de vazamento são código.
+- [x] **Fichas:** as 7 (~7,5 KB) vão inteiras no prompt; sem busca por trechos, sem erro de recuperação (não escalaria para muitas fichas).
 
 ## 6. Golden dataset e LLM as a Judge
 - Usar exatamente as 26 mensagens do enunciado: 19 de escopo, 1 fora do escopo (passaporte), 1 entrada inválida, 2 dados pessoais, 2 prompt injection, 1 aviso de limitação. Perguntas extras só acrescentam.
@@ -43,25 +42,18 @@ Decidir e justificar:
 - Indicadores: acerto, tempo, facilidade de uso (questionário de 5 perguntas, escala 1–5).
 
 ## 8. Entregáveis (checklist)
-- [ ] Protótipo testável (notebook executado ou repositório + instruções; diagrama do grafo se for script)
-- [ ] Organização das fichas
-- [ ] Pipeline do juiz + resultados antes/depois
-- [ ] Relatório dos testes com usuários (acerto, tempo, facilidade)
-- [ ] Justificativas e limitações (framework, arquitetura, modelo, o que mudou, o que não faz)
-- [ ] Nomes completos dos integrantes no início
+- [ ] Protótipo testável: notebook com instruções de execução pronto; falta salvar a versão executada do Kaggle (com as saídas)
+- [x] Organização das fichas (`referencia/`, carregadas inteiras no prompt, seção 1 do notebook)
+- [x] Pipeline do juiz + resultados antes/depois (seção 12)
+- [x] Relatório dos testes com usuários (seção 13, dados simulados)
+- [x] Justificativas e limitações (seções 5 e 11)
+- [x] Nomes completos dos integrantes no início
 
 ## 9. Critérios de avaliação
 Acerto no golden dataset e citação das fichas; entradas inválidas, avisos e acessibilidade; arquitetura e justificativas; uso de dados pessoais (penaliza); juiz antes/depois; resistência a prompt injection; testes com usuários; organização.
 
-## 10. Justificativas (arquitetura)
-- **Framework: LangChain.** O fluxo é simples (prompt | modelo | parser) e o grupo já conhece a biblioteca. LangGraph ou CrewAI adicionariam grafo e papéis sem necessidade.
-- **Agente único.** A tarefa é uma só: responder com base em 7 fichas que cabem no contexto. Vários agentes aumentariam custo, latência e a superfície para prompt injection.
-- **Modelos (Groq).** Agente: `openai/gpt-oss-120b` (maior da família gratuita, segue instruções, contexto de 131k). Juiz: `openai/gpt-oss-20b`, modelo diferente para o juiz não avaliar a si mesmo. Os modelos Llama saíram do plano gratuito da Groq, por isso a escolha. Limite gratuito: 8 mil tokens por minuto e 200 mil por dia por modelo.
-- **Onde entra IA:** entender a pergunta, redigir a resposta citando a ficha e julgar as respostas no golden dataset.
-- **Onde bastam código e lógica:** validação de entrada (vazia, longa, sem sentido), ocultação de dados pessoais por regex, aviso fixo em toda resposta, carga das fichas e checagem de vazamento de dado pessoal na avaliação.
-- **Fichas:** as 7 fichas (~7,5 KB) vão inteiras no prompt. Sem busca por trechos, não há erro de recuperação. Não escalaria para muitas fichas.
-- **Privacidade:** sem histórico, sem logs e sem salvar conversas. Dados pessoais são ocultados antes de chamar o modelo. Testes e golden só com dados fictícios, e as tabelas mostram a mensagem já ocultada.
-- **Prompt injection:** a mensagem do usuário entra delimitada e tratada como dado; as regras do prompt mandam recusar mudanças de regra e não revelar instruções.
+## 10. Justificativas
+Resumidas na seção 5; privacidade e prompt injection nas seções 3 e 4; limitações na seção 11.
 
 ## 11. Limitações
 - Não consulta situação cadastral nem agenda atendimento; usa só as 7 fichas fictícias.
